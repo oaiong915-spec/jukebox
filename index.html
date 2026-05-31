@@ -9,31 +9,27 @@
 body{font-family:'Noto Sans KR',sans-serif;background:linear-gradient(135deg,#fff,#f0f9ff);min-height:100vh;color:#0f172a;}
 .header{background:linear-gradient(135deg,#2563eb,#1e40af);color:#fff;padding:3rem 2rem;text-align:center;}
 .header h1{font-size:48px;margin-bottom:10px;}
-.header p{font-size:12px;letter-spacing:2px;}
 .container{max-width:700px;margin:0 auto;padding:2rem 1rem;}
 .card{background:#fff;border-left:4px solid #2563eb;padding:2rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
 .card-title{font-size:12px;font-weight:700;color:#2563eb;letter-spacing:1px;text-transform:uppercase;margin-bottom:1.5rem;}
-.form-group{margin-bottom:1rem;}
-.form-group label{display:block;font-size:12px;color:#64748b;margin-bottom:6px;font-weight:600;}
-input{width:100%;padding:10px;border:1px solid #e2e8f0;font-size:14px;font-family:'Noto Sans KR',sans-serif;}
-input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
 .btn{padding:12px 20px;border:none;cursor:pointer;font-size:14px;font-weight:600;width:100%;margin-bottom:10px;font-family:'Noto Sans KR',sans-serif;transition:all .2s;}
 .btn-primary{background:#2563eb;color:#fff;}
 .btn-primary:hover{background:#1e40af;}
 .btn-secondary{background:#fff;color:#2563eb;border:2px solid #2563eb;}
 .btn-secondary:hover{background:#dbeafe;}
+input{width:100%;padding:10px;border:1px solid #e2e8f0;font-size:14px;margin-bottom:10px;font-family:'Noto Sans KR',sans-serif;}
+input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
 .hidden{display:none!important;}
-.divider{text-align:center;color:#64748b;font-size:12px;margin:1.5rem 0;}
-.alert{position:fixed;bottom:20px;right:20px;padding:15px 20px;background:#fff;border-left:4px solid #2563eb;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:13px;z-index:100;}
-.alert.error{border-left-color:#ef4444;color:#ef4444;}
-.badge{display:inline-block;padding:6px 12px;background:#f1f5f9;color:#2563eb;font-size:11px;font-weight:600;margin-right:8px;}
+.alert{position:fixed;bottom:20px;right:20px;padding:15px 20px;background:#fff;border-left:4px solid #2563eb;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:13px;z-index:100;animation:slideIn .3s;}
+@keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+.badge{display:inline-block;padding:6px 12px;background:#f1f5f9;color:#2563eb;font-size:11px;margin-right:8px;}
 .np-title{font-size:24px;font-weight:700;margin:1rem 0;}
 .controls{display:flex;gap:10px;align-items:center;margin:1.5rem 0;}
-.play-btn{width:50px;height:50px;background:#2563eb;color:#fff;border:none;cursor:pointer;font-size:18px;flex-shrink:0;}
+.play-btn{width:50px;height:50px;background:#2563eb;color:#fff;border:none;cursor:pointer;font-size:18px;}
 .play-btn:hover{background:#1e40af;}
-.btn-sm{width:40px;height:40px;border:1px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;flex-shrink:0;}
+.btn-sm{width:40px;height:40px;border:1px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;}
 .btn-sm:hover{border-color:#2563eb;color:#2563eb;}
-.progress{flex:1;height:6px;background:#e2e8f0;cursor:pointer;border-radius:3px;overflow:hidden;}
+.progress{flex:1;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;}
 .progress-fill{height:100%;background:#2563eb;width:0%;}
 .time{font-size:12px;color:#64748b;font-family:monospace;min-width:50px;text-align:right;}
 .playlist{max-height:300px;overflow-y:auto;border:1px solid #e2e8f0;}
@@ -45,60 +41,341 @@ input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,23
 .pl-del{width:28px;height:28px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer;font-size:12px;}
 .pl-del:hover{border-color:#ef4444;color:#ef4444;}
 .input-row{display:flex;gap:10px;margin-bottom:1rem;}
-.input-row input{flex:1;}
-.input-row .btn{margin-bottom:0;width:auto;flex-shrink:0;}
+.input-row input{flex:1;margin-bottom:0;}
+.input-row .btn{margin-bottom:0;width:auto;}
 .folders{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
 .folder-btn{padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;cursor:pointer;font-size:11px;font-weight:600;}
 .folder-btn:hover{border-color:#2563eb;color:#2563eb;}
-.folder-btn.active{background:#2563eb;color:#fff;border-color:#2563eb;}
-.user-info{background:#f8fafc;padding:1rem;margin-bottom:1rem;}
-.user-info strong{display:block;margin-bottom:4px;}
-@media(max-width:640px){.header{padding:2rem 1rem;}.card{padding:1.5rem;}}
+.folder-btn.active{background:#2563eb;color:#fff;}
+.divider{text-align:center;color:#64748b;font-size:12px;margin:1.5rem 0;}
 </style>
 </head>
 <body>
-<div class="header"><h1>♪ BGM</h1><p>JUKEBOX</p></div>
+
+<div class="header">
+  <h1>♪ BGM</h1>
+</div>
+
 <div class="container">
-<div id="login-screen">
-<div class="card"><div class="card-title">로그인</div><p style="color:#64748b;font-size:13px;margin-bottom:1.5rem;">GM은 로그인하여 방을 저장합니다.</p><button class="btn btn-primary" id="btn-google">🔐 Google 로그인</button><button class="btn btn-primary" id="btn-github">🔐 GitHub 로그인</button><div class="divider">또는</div><button class="btn btn-secondary" id="btn-guest">게스트로 계속</button></div>
+  <div id="login-screen">
+    <div class="card">
+      <div class="card-title">시작</div>
+      <p style="color:#64748b;font-size:13px;margin-bottom:1.5rem;">방을 생성하거나 참여하세요</p>
+      <button class="btn btn-primary" onclick="goToSetup()">시작</button>
+    </div>
+  </div>
+
+  <div id="setup-screen" class="hidden">
+    <div class="card">
+      <div class="card-title">👑 방 생성</div>
+      <input type="text" id="room-name" placeholder="세션 이름 (예: 용의 굴)">
+      <button class="btn btn-primary" onclick="createRoom()">방 생성</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎭 방 참여</div>
+      <div class="input-row">
+        <input type="text" id="join-code" placeholder="방 코드">
+        <button class="btn btn-primary" onclick="joinRoom()">입장</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="player-screen" class="hidden">
+    <div class="card">
+      <div class="np-title" id="now-playing">대기 중...</div>
+      <span id="room-badge" class="badge"></span>
+      <span id="role-badge" class="badge">GM</span>
+
+      <div class="controls" id="gm-controls">
+        <button class="play-btn" id="play-btn" onclick="togglePlay()">▶</button>
+        <button class="btn-sm" onclick="prev()">⏮</button>
+        <button class="btn-sm" onclick="next()">⏭</button>
+        <div class="progress" id="progress">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="time" id="time">0:00</span>
+      </div>
+    </div>
+
+    <div id="gm-screen" class="hidden">
+      <div class="card">
+        <div class="card-title">플레이리스트</div>
+        <div class="input-row">
+          <input type="text" id="yt-url" placeholder="YouTube URL">
+          <button class="btn btn-primary" onclick="addTrack()">추가</button>
+        </div>
+        <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:8px;">폴더</label>
+        <div class="folders" id="folders"></div>
+        <button class="btn btn-secondary" onclick="addFolder()" style="width:auto;padding:8px 14px;font-size:12px;margin-bottom:1rem;">+ 폴더</button>
+        <div id="playlist" class="playlist"></div>
+      </div>
+
+      <div class="card">
+        <button class="btn btn-secondary" onclick="copyCode()" style="margin-bottom:10px;">코드 복사</button>
+        <button class="btn btn-secondary" onclick="leave()" style="background:#fff;color:#ef4444;border-color:#ef4444;">나가기</button>
+      </div>
+    </div>
+
+    <div id="guest-screen" class="hidden">
+      <div class="card">
+        <p style="color:#64748b;margin-bottom:1rem;">GM이 재생하는 음악을 볼 수 있습니다.</p>
+        <button class="btn btn-secondary" onclick="leave()" style="background:#fff;color:#ef4444;border-color:#ef4444;">나가기</button>
+      </div>
+    </div>
+  </div>
 </div>
-<div id="setup-screen" class="hidden">
-<div id="user-card" class="card hidden"><div class="user-info"><strong id="user-name"></strong><small>GM</small></div><button class="btn btn-secondary" id="btn-logout">로그아웃</button></div>
-<div class="card"><div class="card-title">👑 방 생성</div><div class="form-group"><label>세션 이름</label><input type="text" id="room-name" placeholder="예: 용의 굴"></div><button class="btn btn-primary" id="btn-create">방 생성</button></div>
-<div class="card"><div class="card-title">🎭 방 참여</div><div class="input-row"><input type="text" id="join-code" placeholder="방 코드"><button class="btn btn-primary" id="btn-join">입장</button></div></div>
-</div>
-<div id="player-screen" class="hidden">
-<div class="card"><div class="np-title" id="now-playing">대기 중...</div><div><span id="role-badge" class="badge">👑 GM</span><span id="room-badge" class="badge"></span></div><div class="controls" id="gm-controls"><button class="play-btn" id="play-btn">▶</button><button class="btn-sm" id="btn-prev">⏮</button><button class="btn-sm" id="btn-next">⏭</button><div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div></div><span class="time" id="time">0:00</span></div></div>
-<div id="gm-screen" class="hidden">
-<div class="card"><div class="card-title">플레이리스트</div><div class="form-group"><label>YouTube URL</label><div class="input-row"><input type="text" id="yt-url" placeholder="https://youtube.com/watch?v=..."><button class="btn btn-primary" id="btn-add">추가</button></div></div><div style="margin-bottom:1.5rem;"><label style="display:block;font-size:11px;color:#64748b;margin-bottom:8px;font-weight:600;text-transform:uppercase;">폴더</label><div class="folders" id="folders"></div><button class="btn btn-secondary" id="btn-folder" style="padding:8px 14px;font-size:12px;width:auto;margin-bottom:1rem;">+ 폴더</button></div><div id="playlist" class="playlist"></div></div>
-<div class="card"><button class="btn btn-secondary" id="btn-copy">코드 복사</button><button class="btn btn-secondary" id="btn-leave" style="background:#fff;color:#ef4444;border-color:#ef4444;">나가기</button></div>
-</div>
-<div id="guest-screen" class="hidden">
-<div class="card"><div class="card-title">🎭 플레이어</div><p style="color:#64748b;font-size:13px;margin-bottom:1rem;">GM이 재생하는 음악이 자동 동기화됩니다.</p><button class="btn btn-primary" id="btn-sync">동기화</button><button class="btn btn-secondary" id="btn-leave-guest" style="background:#fff;color:#ef4444;border-color:#ef4444;">나가기</button></div>
-</div>
-</div>
-</div>
+
 <div id="yt-player" style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;"></div>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.compat.js"></script>
+
 <script>
-let db,auth;let state={uid:null,role:null,code:null,folderIdx:0,folders:[{name:"기본",songs:[]}],currentIdx:-1,playing:false,vol:80,player:null,playerReady:false};
-function initFirebase(){const config={apiKey:"AIzaSyDpW1LqWFPaFrPBHuH1NvJA93FlyKZDleM",authDomain:"trpg-jukebox-d7110.firebaseapp.com",databaseURL:"https://trpg-jukebox-d7110-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"trpg-jukebox-d7110",storageBucket:"trpg-jukebox-d7110.firebasestorage.app",messagingSenderId:"208176725806",appId:"1:208176725806:web:ddb6e91604b50193fa84bf"};firebase.initializeApp(config);db=firebase.database();auth=firebase.auth();auth.onAuthStateChanged(user=>{if(user){state.uid=user.uid;document.getElementById('user-name').textContent=user.displayName||user.email;document.getElementById('user-card').classList.remove('hidden');}else{state.uid=null;document.getElementById('user-card').classList.add('hidden');}});setupUI();}
-function setupUI(){document.getElementById('btn-google').addEventListener('click',()=>{const provider=new firebase.auth.GoogleAuthProvider();auth.signInWithPopup(provider).catch(e=>showAlert(e.message,'error'));});document.getElementById('btn-github').addEventListener('click',()=>{const provider=new firebase.auth.GithubAuthProvider();auth.signInWithPopup(provider).catch(e=>showAlert(e.message,'error'));});document.getElementById('btn-guest').addEventListener('click',()=>{document.getElementById('login-screen').classList.add('hidden');document.getElementById('setup-screen').classList.remove('hidden');showAlert("게스트 모드 시작");});document.getElementById('btn-logout').addEventListener('click',()=>{auth.signOut();showAlert("로그아웃됨");});document.getElementById('btn-create').addEventListener('click',()=>{if(!state.uid){showAlert("로그인 후 방을 생성할 수 있습니다",'error');return;}const name=document.getElementById('room-name').value.trim()||"새 세션";state.code=Math.random().toString(36).substring(2,8).toUpperCase();state.role='gm';db.ref('rooms/'+state.code+'/meta').set({name:name,gm:state.uid,ts:Date.now()});enterPlayer();showAlert("방 생성됨: "+state.code);});document.getElementById('btn-join').addEventListener('click',()=>{const code=document.getElementById('join-code').value.trim().toUpperCase();if(!code){showAlert("방 코드를 입력하세요",'error');return;}db.ref('rooms/'+code+'/meta').once('value',snap=>{if(!snap.exists()){showAlert("방을 찾을 수 없습니다",'error');return;}state.code=code;state.role='guest';enterPlayer();showAlert("입장됨");});});document.getElementById('btn-add').addEventListener('click',()=>{const url=document.getElementById('yt-url').value.trim();const m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);const vid=m?m[1]:null;if(!vid){showAlert("유효한 YouTube URL을 입력하세요",'error');return;}state.folders[state.folderIdx].songs.push({vid:vid,title:"트랙 "+(state.folders[state.folderIdx].songs.length+1)});document.getElementById('yt-url').value='';renderPlaylist();syncState();showAlert("곡 추가됨");});document.getElementById('btn-folder').addEventListener('click',()=>{const name=prompt("폴더 이름:");if(name){state.folders.push({name:name,songs:[]});renderFolders();}});document.getElementById('play-btn').addEventListener('click',()=>{if(!state.player||!state.playerReady)return;if(state.playing){state.player.pauseVideo();state.playing=false;document.getElementById('play-btn').textContent='▶';}else{state.player.playVideo();state.playing=true;document.getElementById('play-btn').textContent='⏸';}syncState();});document.getElementById('btn-prev').addEventListener('click',()=>{if(state.currentIdx>0)playTrack(state.currentIdx-1);});document.getElementById('btn-next').addEventListener('click',()=>{const songs=state.folders[state.folderIdx].songs;if(state.currentIdx<songs.length-1)playTrack(state.currentIdx+1);});document.getElementById('progress').addEventListener('click',(e)=>{if(!state.player||!state.playerReady)return;const dur=state.player.getDuration();if(!dur)return;const r=e.currentTarget.getBoundingClientRect();state.player.seekTo(dur*(e.clientX-r.left)/r.width,true);});document.getElementById('btn-copy').addEventListener('click',()=>{navigator.clipboard.writeText(state.code).then(()=>{showAlert("코드 복사됨: "+state.code);});});document.getElementById('btn-leave').addEventListener('click',leave);document.getElementById('btn-leave-guest').addEventListener('click',leave);document.getElementById('btn-sync').addEventListener('click',()=>location.reload());}
-function showAlert(msg,type='success'){const el=document.createElement('div');el.className='alert '+type;el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
-function enterPlayer(){document.getElementById('login-screen').classList.add('hidden');document.getElementById('setup-screen').classList.add('hidden');document.getElementById('player-screen').classList.remove('hidden');document.getElementById('room-badge').textContent=state.code;if(state.role==='gm'){document.getElementById('gm-screen').classList.remove('hidden');document.getElementById('guest-screen').classList.add('hidden');document.getElementById('gm-controls').style.display='flex';renderFolders();renderPlaylist();}else{document.getElementById('gm-screen').classList.add('hidden');document.getElementById('guest-screen').classList.remove('hidden');document.getElementById('gm-controls').style.display='none';startGuestSync();}initYT();setInterval(syncState,2000);}
-function leave(){state.code=null;state.role=null;document.getElementById('player-screen').classList.add('hidden');document.getElementById('setup-screen').classList.remove('hidden');showAlert("나갔습니다");}
-function renderFolders(){const el=document.getElementById('folders');el.innerHTML=state.folders.map((f,i)=>{const btn=document.createElement('button');btn.className='folder-btn'+(i===state.folderIdx?' active':'');btn.textContent=f.name;btn.addEventListener('click',()=>switchFolder(i));return btn.outerHTML;}).join('');}
-function switchFolder(i){state.folderIdx=i;state.currentIdx=-1;renderFolders();renderPlaylist();}
-function renderPlaylist(){const songs=state.folders[state.folderIdx].songs;const el=document.getElementById('playlist');if(!songs.length){el.innerHTML='<div style="padding:2rem;text-align:center;color:#64748b;">곡이 없습니다</div>';return;}el.innerHTML=songs.map((s,i)=>{const item=document.createElement('div');item.className='pl-item'+(i===state.currentIdx?' active':'');item.innerHTML=`<span class="pl-num">${i+1}</span><span class="pl-name">${s.title}</span><button class="pl-del">✕</button>`;item.addEventListener('click',()=>playTrack(i));item.querySelector('.pl-del').addEventListener('click',(e)=>{e.stopPropagation();removeTrack(i);});return item.outerHTML;}).join('');}
-function playTrack(i){state.currentIdx=i;state.playing=true;const song=state.folders[state.folderIdx].songs[i];document.getElementById('now-playing').textContent=song.title;document.getElementById('play-btn').textContent='⏸';renderPlaylist();if(state.player&&state.playerReady){state.player.loadVideoById(song.vid);}syncState();}
-function removeTrack(i){state.folders[state.folderIdx].songs.splice(i,1);renderPlaylist();syncState();}
-function syncState(){if(!state.code||state.role!=='gm')return;const time=state.player&&state.playerReady?state.player.getCurrentTime():0;const songs=state.folders[state.folderIdx].songs;db.ref('rooms/'+state.code+'/state').set({folders:state.folders,folderIdx:state.folderIdx,currentIdx:state.currentIdx,playing:state.playing,vid:state.currentIdx>=0?songs[state.currentIdx].vid:null,time:time,ts:Date.now()});}
-function startGuestSync(){db.ref('rooms/'+state.code+'/state').on('value',snap=>{if(!snap.exists())return;const d=snap.val();state.folders=d.folders||state.folders;state.folderIdx=d.folderIdx||0;state.currentIdx=d.currentIdx||-1;const songs=state.folders[state.folderIdx].songs;if(state.currentIdx>=0){document.getElementById('now-playing').textContent=songs[state.currentIdx].title;}if(state.player&&state.playerReady&&d.vid){const curVid=state.player.getVideoData().video_id;if(curVid!==d.vid){state.player.loadVideoById(d.vid);setTimeout(()=>{if(d.time)state.player.seekTo(d.time,true);if(d.playing)state.player.playVideo();else state.player.pauseVideo();},500);}}});}
-function initYT(){if(window.YT&&window.YT.Player){createYTPlayer();return;}window.onYouTubeIframeAPIReady=()=>{createYTPlayer();};const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);}
-function createYTPlayer(){if(state.player)return;state.player=new YT.Player('yt-player',{height:'1',width:'1',playerVars:{autoplay:0,controls:0},events:{onReady:()=>{state.playerReady=true;state.player.setVolume(state.vol);},onStateChange:(e)=>{if(e.data===YT.PlayerState.ENDED&&state.role==='gm'){const songs=state.folders[state.folderIdx].songs;if(state.currentIdx<songs.length-1)playTrack(state.currentIdx+1);}}}});}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initFirebase);}else{initFirebase();}
+let state = {
+  role: null,
+  code: null,
+  folderIdx: 0,
+  folders: [{name: "기본", songs: []}],
+  currentIdx: -1,
+  playing: false,
+  vol: 80,
+  player: null,
+  playerReady: false
+};
+
+function showAlert(msg) {
+  const el = document.createElement('div');
+  el.className = 'alert';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+function goToSetup() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('setup-screen').classList.remove('hidden');
+  showAlert("시작!");
+}
+
+function createRoom() {
+  const name = document.getElementById('room-name').value.trim() || "새 세션";
+  state.code = Math.random().toString(36).substring(2, 8).toUpperCase();
+  state.role = 'gm';
+  state.folders = [{name: "기본", songs: []}];
+  state.folderIdx = 0;
+  state.currentIdx = -1;
+  
+  localStorage.setItem('jukebox_' + state.code, JSON.stringify(state.folders));
+  enterPlayer();
+  showAlert("방 생성: " + state.code);
+}
+
+function joinRoom() {
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (!code) {
+    showAlert("방 코드를 입력하세요");
+    return;
+  }
+  
+  const data = localStorage.getItem('jukebox_' + code);
+  if (!data) {
+    showAlert("방을 찾을 수 없습니다");
+    return;
+  }
+  
+  state.code = code;
+  state.role = 'guest';
+  state.folders = JSON.parse(data);
+  state.folderIdx = 0;
+  enterPlayer();
+  showAlert("입장");
+}
+
+function enterPlayer() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('setup-screen').classList.add('hidden');
+  document.getElementById('player-screen').classList.remove('hidden');
+  document.getElementById('room-badge').textContent = state.code;
+  document.getElementById('role-badge').textContent = state.role === 'gm' ? '👑 GM' : '🎭 플레이어';
+  
+  if (state.role === 'gm') {
+    document.getElementById('gm-screen').classList.remove('hidden');
+    document.getElementById('guest-screen').classList.add('hidden');
+    renderFolders();
+    renderPlaylist();
+    setInterval(() => {
+      localStorage.setItem('jukebox_' + state.code, JSON.stringify(state.folders));
+    }, 1000);
+  } else {
+    document.getElementById('gm-screen').classList.add('hidden');
+    document.getElementById('guest-screen').classList.remove('hidden');
+    setInterval(() => {
+      const data = localStorage.getItem('jukebox_' + state.code);
+      if (data) {
+        state.folders = JSON.parse(data);
+        const songs = state.folders[state.folderIdx].songs;
+        if (state.currentIdx >= 0 && state.currentIdx < songs.length) {
+          document.getElementById('now-playing').textContent = songs[state.currentIdx].title;
+        }
+      }
+    }, 1000);
+  }
+  
+  initYT();
+}
+
+function leave() {
+  state.code = null;
+  state.role = null;
+  document.getElementById('player-screen').classList.add('hidden');
+  document.getElementById('setup-screen').classList.remove('hidden');
+  showAlert("나갔습니다");
+}
+
+function addFolder() {
+  const name = prompt("폴더 이름:");
+  if (name) {
+    state.folders.push({name, songs: []});
+    renderFolders();
+  }
+}
+
+function renderFolders() {
+  document.getElementById('folders').innerHTML = state.folders.map((f, i) =>
+    `<button class="folder-btn ${i === state.folderIdx ? 'active' : ''}" onclick="switchFolder(${i})">${f.name}</button>`
+  ).join('');
+}
+
+function switchFolder(i) {
+  state.folderIdx = i;
+  state.currentIdx = -1;
+  renderFolders();
+  renderPlaylist();
+}
+
+function addTrack() {
+  const url = document.getElementById('yt-url').value.trim();
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+  const vid = m ? m[1] : null;
+  
+  if (!vid) {
+    showAlert("유효한 YouTube URL을 입력하세요");
+    return;
+  }
+  
+  state.folders[state.folderIdx].songs.push({
+    vid,
+    title: "트랙 " + (state.folders[state.folderIdx].songs.length + 1)
+  });
+  
+  document.getElementById('yt-url').value = '';
+  renderPlaylist();
+  showAlert("곡 추가");
+}
+
+function renderPlaylist() {
+  const songs = state.folders[state.folderIdx].songs;
+  const el = document.getElementById('playlist');
+  
+  if (!songs.length) {
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#64748b;">곡이 없습니다</div>';
+    return;
+  }
+  
+  el.innerHTML = songs.map((s, i) => `
+    <div class="pl-item ${i === state.currentIdx ? 'active' : ''}" onclick="playTrack(${i})">
+      <span class="pl-num">${i + 1}</span>
+      <span class="pl-name">${s.title}</span>
+      <button class="pl-del" onclick="event.stopPropagation();removeTrack(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function playTrack(i) {
+  state.currentIdx = i;
+  state.playing = true;
+  const song = state.folders[state.folderIdx].songs[i];
+  
+  document.getElementById('now-playing').textContent = song.title;
+  document.getElementById('play-btn').textContent = '⏸';
+  renderPlaylist();
+  
+  if (state.player && state.playerReady) {
+    state.player.loadVideoById(song.vid);
+  }
+}
+
+function removeTrack(i) {
+  state.folders[state.folderIdx].songs.splice(i, 1);
+  renderPlaylist();
+}
+
+function togglePlay() {
+  if (!state.player || !state.playerReady) return;
+  
+  if (state.playing) {
+    state.player.pauseVideo();
+    state.playing = false;
+    document.getElementById('play-btn').textContent = '▶';
+  } else {
+    state.player.playVideo();
+    state.playing = true;
+    document.getElementById('play-btn').textContent = '⏸';
+  }
+}
+
+function prev() {
+  if (state.currentIdx > 0) playTrack(state.currentIdx - 1);
+}
+
+function next() {
+  const songs = state.folders[state.folderIdx].songs;
+  if (state.currentIdx < songs.length - 1) playTrack(state.currentIdx + 1);
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(state.code).then(() => {
+    showAlert("코드 복사: " + state.code);
+  });
+}
+
+function initYT() {
+  if (window.YT && window.YT.Player) {
+    createYTPlayer();
+    return;
+  }
+  
+  window.onYouTubeIframeAPIReady = () => {
+    createYTPlayer();
+  };
+  
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+
+function createYTPlayer() {
+  if (state.player) return;
+  
+  state.player = new YT.Player('yt-player', {
+    height: '1',
+    width: '1',
+    playerVars: {autoplay: 0, controls: 0},
+    events: {
+      onReady: () => {
+        state.playerReady = true;
+        state.player.setVolume(state.vol);
+      },
+      onStateChange: (e) => {
+        if (e.data === YT.PlayerState.ENDED && state.role === 'gm') {
+          const songs = state.folders[state.folderIdx].songs;
+          if (state.currentIdx < songs.length - 1) playTrack(state.currentIdx + 1);
+        }
+      }
+    }
+  });
+}
+
+console.log("주크박스 로드됨");
 </script>
+
 </body>
 </html>

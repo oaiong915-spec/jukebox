@@ -183,379 +183,51 @@ input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,23
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.compat.js"></script>
 
 <script>
-console.log("스크립트 시작");
-
 let db, auth;
-let state = {
-  uid: null,
-  role: null,
-  code: null,
-  folderIdx: 0,
-  folders: [{name: "기본", songs: []}],
-  currentIdx: -1,
-  playing: false,
-  vol: 80,
-  player: null,
-  playerReady: false
-};
+let state = {uid:null,role:null,code:null,folderIdx:0,folders:[{name:"기본",songs:[]}],currentIdx:-1,playing:false,vol:80,player:null,playerReady:false};
 
-function initFirebase() {
-  console.log("Firebase 초기화");
-  
-  const config = {
-    apiKey: "AIzaSyDpW1LqWFPaFrPBHuH1NvJA93FlyKZDleM",
-    authDomain: "trpg-jukebox-d7110.firebaseapp.com",
-    databaseURL: "https://trpg-jukebox-d7110-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "trpg-jukebox-d7110",
-    storageBucket: "trpg-jukebox-d7110.firebasestorage.app",
-    messagingSenderId: "208176725806",
-    appId: "1:208176725806:web:ddb6e91604b50193fa84bf"
-  };
-  
+function initFirebase(){
+  const config={apiKey:"AIzaSyDpW1LqWFPaFrPBHuH1NvJA93FlyKZDleM",authDomain:"trpg-jukebox-d7110.firebaseapp.com",databaseURL:"https://trpg-jukebox-d7110-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"trpg-jukebox-d7110",storageBucket:"trpg-jukebox-d7110.firebasestorage.app",messagingSenderId:"208176725806",appId:"1:208176725806:web:ddb6e91604b50193fa84bf"};
   firebase.initializeApp(config);
-  db = firebase.database();
-  auth = firebase.auth();
-  
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      state.uid = user.uid;
-      document.getElementById('user-name').textContent = user.displayName || user.email;
-      document.getElementById('user-card').classList.remove('hidden');
-      console.log("로그인:", user.email);
-    } else {
-      state.uid = null;
-      document.getElementById('user-card').classList.add('hidden');
-    }
-  });
-  
-  setupEventListeners();
-  console.log("Firebase 준비 완료");
+  db=firebase.database();
+  auth=firebase.auth();
+  auth.onAuthStateChanged(user=>{if(user){state.uid=user.uid;document.getElementById('user-name').textContent=user.displayName||user.email;document.getElementById('user-card').classList.remove('hidden');}else{state.uid=null;document.getElementById('user-card').classList.add('hidden');}});
+  setupUI();
 }
 
-function setupEventListeners() {
-  console.log("이벤트 리스너 설정");
-  
-  document.getElementById('btn-google').addEventListener('click', () => {
-    console.log("Google 로그인");
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(e => {
-      alert(e.message, 'error');
-    });
-  });
-  
-  document.getElementById('btn-github').addEventListener('click', () => {
-    console.log("GitHub 로그인");
-    const provider = new firebase.auth.GithubAuthProvider();
-    auth.signInWithPopup(provider).catch(e => {
-      alert(e.message, 'error');
-    });
-  });
-  
-  document.getElementById('btn-guest').addEventListener('click', () => {
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('setup-screen').classList.remove('hidden');
-    alert("게스트 모드");
-  });
-  
-  document.getElementById('btn-logout').addEventListener('click', () => {
-    auth.signOut();
-    alert("로그아웃됨");
-  });
-  
-  document.getElementById('btn-create').addEventListener('click', () => {
-    if (!state.uid) {
-      alert("로그인 후 방을 생성할 수 있습니다", 'error');
-      return;
-    }
-    const name = document.getElementById('room-name').value.trim() || "새 세션";
-    state.code = Math.random().toString(36).substring(2,8).toUpperCase();
-    state.role = 'gm';
-    
-    db.ref('rooms/' + state.code + '/meta').set({
-      name: name,
-      gm: state.uid,
-      ts: Date.now()
-    });
-    
-    enterPlayer();
-    alert("방 생성: " + state.code);
-  });
-  
-  document.getElementById('btn-join').addEventListener('click', () => {
-    const code = document.getElementById('join-code').value.trim().toUpperCase();
-    if (!code) {
-      alert("방 코드를 입력하세요", 'error');
-      return;
-    }
-    
-    db.ref('rooms/' + code + '/meta').once('value', snap => {
-      if (!snap.exists()) {
-        alert("방을 찾을 수 없습니다", 'error');
-        return;
-      }
-      state.code = code;
-      state.role = 'guest';
-      enterPlayer();
-      alert("입장 완료");
-    });
-  });
-  
-  document.getElementById('btn-add').addEventListener('click', () => {
-    const url = document.getElementById('yt-url').value.trim();
-    const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-    const vid = m ? m[1] : null;
-    
-    if (!vid) {
-      alert("유효한 YouTube URL을 입력하세요", 'error');
-      return;
-    }
-    
-    state.folders[state.folderIdx].songs.push({
-      vid: vid,
-      title: "트랙 " + (state.folders[state.folderIdx].songs.length + 1)
-    });
-    
-    document.getElementById('yt-url').value = '';
-    renderPlaylist();
-    syncState();
-    alert("곡 추가됨");
-  });
-  
-  document.getElementById('btn-folder').addEventListener('click', () => {
-    const name = prompt("폴더 이름:");
-    if (name) {
-      state.folders.push({name: name, songs: []});
-      renderFolders();
-    }
-  });
-  
-  document.getElementById('play-btn').addEventListener('click', () => {
-    if (!state.player || !state.playerReady) return;
-    
-    if (state.playing) {
-      state.player.pauseVideo();
-      state.playing = false;
-      document.getElementById('play-btn').textContent = '▶';
-    } else {
-      state.player.playVideo();
-      state.playing = true;
-      document.getElementById('play-btn').textContent = '⏸';
-    }
-    
-    syncState();
-  });
-  
-  document.getElementById('btn-prev').addEventListener('click', () => {
-    if (state.currentIdx > 0) playTrack(state.currentIdx - 1);
-  });
-  
-  document.getElementById('btn-next').addEventListener('click', () => {
-    const songs = state.folders[state.folderIdx].songs;
-    if (state.currentIdx < songs.length - 1) playTrack(state.currentIdx + 1);
-  });
-  
-  document.getElementById('progress').addEventListener('click', (e) => {
-    if (!state.player || !state.playerReady) return;
-    const dur = state.player.getDuration();
-    if (!dur) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    state.player.seekTo(dur * (e.clientX - r.left) / r.width, true);
-  });
-  
-  document.getElementById('btn-copy').addEventListener('click', () => {
-    navigator.clipboard.writeText(state.code).then(() => {
-      alert("코드 복사: " + state.code);
-    });
-  });
-  
-  document.getElementById('btn-leave').addEventListener('click', leave);
-  document.getElementById('btn-leave-guest').addEventListener('click', leave);
-  document.getElementById('btn-sync').addEventListener('click', () => location.reload());
+function setupUI(){
+  document.getElementById('btn-google').addEventListener('click',()=>{const provider=new firebase.auth.GoogleAuthProvider();auth.signInWithPopup(provider).catch(e=>showAlert(e.message,'error'));});
+  document.getElementById('btn-github').addEventListener('click',()=>{const provider=new firebase.auth.GithubAuthProvider();auth.signInWithPopup(provider).catch(e=>showAlert(e.message,'error'));});
+  document.getElementById('btn-guest').addEventListener('click',()=>{document.getElementById('login-screen').classList.add('hidden');document.getElementById('setup-screen').classList.remove('hidden');showAlert("게스트 모드 시작");});
+  document.getElementById('btn-logout').addEventListener('click',()=>{auth.signOut();showAlert("로그아웃됨");});
+  document.getElementById('btn-create').addEventListener('click',()=>{if(!state.uid){showAlert("로그인 후 방을 생성할 수 있습니다",'error');return;}const name=document.getElementById('room-name').value.trim()||"새 세션";state.code=Math.random().toString(36).substring(2,8).toUpperCase();state.role='gm';db.ref('rooms/'+state.code+'/meta').set({name:name,gm:state.uid,ts:Date.now()});enterPlayer();showAlert("방 생성됨: "+state.code);});
+  document.getElementById('btn-join').addEventListener('click',()=>{const code=document.getElementById('join-code').value.trim().toUpperCase();if(!code){showAlert("방 코드를 입력하세요",'error');return;}db.ref('rooms/'+code+'/meta').once('value',snap=>{if(!snap.exists()){showAlert("방을 찾을 수 없습니다",'error');return;}state.code=code;state.role='guest';enterPlayer();showAlert("입장됨");});});
+  document.getElementById('btn-add').addEventListener('click',()=>{const url=document.getElementById('yt-url').value.trim();const m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);const vid=m?m[1]:null;if(!vid){showAlert("유효한 YouTube URL을 입력하세요",'error');return;}state.folders[state.folderIdx].songs.push({vid:vid,title:"트랙 "+(state.folders[state.folderIdx].songs.length+1)});document.getElementById('yt-url').value='';renderPlaylist();syncState();showAlert("곡 추가됨");});
+  document.getElementById('btn-folder').addEventListener('click',()=>{const name=prompt("폴더 이름:");if(name){state.folders.push({name:name,songs:[]});renderFolders();}});
+  document.getElementById('play-btn').addEventListener('click',()=>{if(!state.player||!state.playerReady)return;if(state.playing){state.player.pauseVideo();state.playing=false;document.getElementById('play-btn').textContent='▶';}else{state.player.playVideo();state.playing=true;document.getElementById('play-btn').textContent='⏸';}syncState();});
+  document.getElementById('btn-prev').addEventListener('click',()=>{if(state.currentIdx>0)playTrack(state.currentIdx-1);});
+  document.getElementById('btn-next').addEventListener('click',()=>{const songs=state.folders[state.folderIdx].songs;if(state.currentIdx<songs.length-1)playTrack(state.currentIdx+1);});
+  document.getElementById('progress').addEventListener('click',(e)=>{if(!state.player||!state.playerReady)return;const dur=state.player.getDuration();if(!dur)return;const r=e.currentTarget.getBoundingClientRect();state.player.seekTo(dur*(e.clientX-r.left)/r.width,true);});
+  document.getElementById('btn-copy').addEventListener('click',()=>{navigator.clipboard.writeText(state.code).then(()=>{showAlert("코드 복사됨: "+state.code);});});
+  document.getElementById('btn-leave').addEventListener('click',leave);
+  document.getElementById('btn-leave-guest').addEventListener('click',leave);
+  document.getElementById('btn-sync').addEventListener('click',()=>location.reload());
 }
 
-function alert(msg, type='success') {
-  const el = document.createElement('div');
-  el.className = 'alert ' + type;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
-}
+function showAlert(msg,type='success'){const el=document.createElement('div');el.className='alert '+type;el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
+function enterPlayer(){document.getElementById('login-screen').classList.add('hidden');document.getElementById('setup-screen').classList.add('hidden');document.getElementById('player-screen').classList.remove('hidden');document.getElementById('room-badge').textContent=state.code;if(state.role==='gm'){document.getElementById('gm-screen').classList.remove('hidden');document.getElementById('guest-screen').classList.add('hidden');document.getElementById('gm-controls').style.display='flex';renderFolders();renderPlaylist();}else{document.getElementById('gm-screen').classList.add('hidden');document.getElementById('guest-screen').classList.remove('hidden');document.getElementById('gm-controls').style.display='none';startGuestSync();}initYT();setInterval(syncState,2000);}
+function leave(){state.code=null;state.role=null;document.getElementById('player-screen').classList.add('hidden');document.getElementById('setup-screen').classList.remove('hidden');showAlert("나갔습니다");}
+function renderFolders(){const el=document.getElementById('folders');el.innerHTML=state.folders.map((f,i)=>{const btn=document.createElement('button');btn.className='folder-btn'+(i===state.folderIdx?' active':'');btn.textContent=f.name;btn.addEventListener('click',()=>switchFolder(i));return btn.outerHTML;}).join('');}
+function switchFolder(i){state.folderIdx=i;state.currentIdx=-1;renderFolders();renderPlaylist();}
+function renderPlaylist(){const songs=state.folders[state.folderIdx].songs;const el=document.getElementById('playlist');if(!songs.length){el.innerHTML='<div style="padding:2rem;text-align:center;color:#64748b;">곡이 없습니다</div>';return;}el.innerHTML=songs.map((s,i)=>{const item=document.createElement('div');item.className='pl-item'+(i===state.currentIdx?' active':'');item.innerHTML=`<span class="pl-num">${i+1}</span><span class="pl-name">${s.title}</span><button class="pl-del">✕</button>`;item.addEventListener('click',()=>playTrack(i));item.querySelector('.pl-del').addEventListener('click',(e)=>{e.stopPropagation();removeTrack(i);});return item.outerHTML;}).join('');}
+function playTrack(i){state.currentIdx=i;state.playing=true;const song=state.folders[state.folderIdx].songs[i];document.getElementById('now-playing').textContent=song.title;document.getElementById('play-btn').textContent='⏸';renderPlaylist();if(state.player&&state.playerReady){state.player.loadVideoById(song.vid);}syncState();}
+function removeTrack(i){state.folders[state.folderIdx].songs.splice(i,1);renderPlaylist();syncState();}
+function syncState(){if(!state.code||state.role!=='gm')return;const time=state.player&&state.playerReady?state.player.getCurrentTime():0;const songs=state.folders[state.folderIdx].songs;db.ref('rooms/'+state.code+'/state').set({folders:state.folders,folderIdx:state.folderIdx,currentIdx:state.currentIdx,playing:state.playing,vid:state.currentIdx>=0?songs[state.currentIdx].vid:null,time:time,ts:Date.now()});}
+function startGuestSync(){db.ref('rooms/'+state.code+'/state').on('value',snap=>{if(!snap.exists())return;const d=snap.val();state.folders=d.folders||state.folders;state.folderIdx=d.folderIdx||0;state.currentIdx=d.currentIdx||-1;const songs=state.folders[state.folderIdx].songs;if(state.currentIdx>=0){document.getElementById('now-playing').textContent=songs[state.currentIdx].title;}if(state.player&&state.playerReady&&d.vid){const curVid=state.player.getVideoData().video_id;if(curVid!==d.vid){state.player.loadVideoById(d.vid);setTimeout(()=>{if(d.time)state.player.seekTo(d.time,true);if(d.playing)state.player.playVideo();else state.player.pauseVideo();},500);}}});}
+function initYT(){if(window.YT&&window.YT.Player){createYTPlayer();return;}window.onYouTubeIframeAPIReady=()=>{createYTPlayer();};const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);}
+function createYTPlayer(){if(state.player)return;state.player=new YT.Player('yt-player',{height:'1',width:'1',playerVars:{autoplay:0,controls:0},events:{onReady:()=>{state.playerReady=true;state.player.setVolume(state.vol);},onStateChange:(e)=>{if(e.data===YT.PlayerState.ENDED&&state.role==='gm'){const songs=state.folders[state.folderIdx].songs;if(state.currentIdx<songs.length-1)playTrack(state.currentIdx+1);}}}});}
 
-function enterPlayer() {
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('setup-screen').classList.add('hidden');
-  document.getElementById('player-screen').classList.remove('hidden');
-  
-  document.getElementById('room-badge').textContent = state.code;
-  
-  if (state.role === 'gm') {
-    document.getElementById('gm-screen').classList.remove('hidden');
-    document.getElementById('guest-screen').classList.add('hidden');
-    document.getElementById('gm-controls').style.display = 'flex';
-    renderFolders();
-    renderPlaylist();
-  } else {
-    document.getElementById('gm-screen').classList.add('hidden');
-    document.getElementById('guest-screen').classList.remove('hidden');
-    document.getElementById('gm-controls').style.display = 'none';
-    startGuestSync();
-  }
-  
-  initYT();
-  setInterval(syncState, 2000);
-}
-
-function leave() {
-  state.code = null;
-  state.role = null;
-  document.getElementById('player-screen').classList.add('hidden');
-  document.getElementById('setup-screen').classList.remove('hidden');
-  alert("나갔습니다");
-}
-
-function renderFolders() {
-  const el = document.getElementById('folders');
-  el.innerHTML = state.folders.map((f, i) => 
-    `<button class="folder-btn ${i===state.folderIdx?'active':''}" onclick="switchFolder(${i})">${f.name}</button>`
-  ).join('');
-}
-
-function switchFolder(i) {
-  state.folderIdx = i;
-  state.currentIdx = -1;
-  renderFolders();
-  renderPlaylist();
-}
-
-function renderPlaylist() {
-  const songs = state.folders[state.folderIdx].songs;
-  const el = document.getElementById('playlist');
-  
-  if (!songs.length) {
-    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#64748b;">곡이 없습니다</div>';
-    return;
-  }
-  
-  el.innerHTML = songs.map((s, i) => `
-    <div class="pl-item ${i===state.currentIdx?'active':''}" onclick="playTrack(${i})">
-      <span class="pl-num">${i+1}</span>
-      <span class="pl-name">${s.title}</span>
-      <button class="pl-del" onclick="event.stopPropagation();removeTrack(${i})">✕</button>
-    </div>
-  `).join('');
-}
-
-function playTrack(i) {
-  state.currentIdx = i;
-  state.playing = true;
-  const song = state.folders[state.folderIdx].songs[i];
-  
-  document.getElementById('now-playing').textContent = song.title;
-  document.getElementById('play-btn').textContent = '⏸';
-  renderPlaylist();
-  
-  if (state.player && state.playerReady) {
-    state.player.loadVideoById(song.vid);
-  }
-  
-  syncState();
-}
-
-function removeTrack(i) {
-  state.folders[state.folderIdx].songs.splice(i, 1);
-  renderPlaylist();
-  syncState();
-}
-
-function syncState() {
-  if (!state.code || state.role !== 'gm') return;
-  
-  const time = state.player && state.playerReady ? state.player.getCurrentTime() : 0;
-  const songs = state.folders[state.folderIdx].songs;
-  
-  db.ref('rooms/' + state.code + '/state').set({
-    folders: state.folders,
-    folderIdx: state.folderIdx,
-    currentIdx: state.currentIdx,
-    playing: state.playing,
-    vid: state.currentIdx >= 0 ? songs[state.currentIdx].vid : null,
-    time: time,
-    ts: Date.now()
-  });
-}
-
-function startGuestSync() {
-  db.ref('rooms/' + state.code + '/state').on('value', snap => {
-    if (!snap.exists()) return;
-    const d = snap.val();
-    
-    state.folders = d.folders || state.folders;
-    state.folderIdx = d.folderIdx || 0;
-    state.currentIdx = d.currentIdx || -1;
-    
-    const songs = state.folders[state.folderIdx].songs;
-    if (state.currentIdx >= 0) {
-      document.getElementById('now-playing').textContent = songs[state.currentIdx].title;
-    }
-    
-    if (state.player && state.playerReady && d.vid) {
-      const curVid = state.player.getVideoData().video_id;
-      if (curVid !== d.vid) {
-        state.player.loadVideoById(d.vid);
-        setTimeout(() => {
-          if (d.time) state.player.seekTo(d.time, true);
-          if (d.playing) state.player.playVideo();
-          else state.player.pauseVideo();
-        }, 500);
-      }
-    }
-  });
-}
-
-function initYT() {
-  if (window.YT && window.YT.Player) {
-    createYTPlayer();
-    return;
-  }
-  
-  window.onYouTubeIframeAPIReady = () => {
-    createYTPlayer();
-  };
-  
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
-}
-
-function createYTPlayer() {
-  if (state.player) return;
-  
-  state.player = new YT.Player('yt-player', {
-    height: '1',
-    width: '1',
-    playerVars: {autoplay: 0, controls: 0},
-    events: {
-      onReady: () => {
-        state.playerReady = true;
-        console.log("YouTube 준비");
-        state.player.setVolume(state.vol);
-      },
-      onStateChange: (e) => {
-        if (e.data === YT.PlayerState.ENDED && state.role === 'gm') {
-          const songs = state.folders[state.folderIdx].songs;
-          if (state.currentIdx < songs.length - 1) playTrack(state.currentIdx + 1);
-        }
-      }
-    }
-  });
-}
-
-// 시작
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initFirebase);
-} else {
-  initFirebase();
-}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initFirebase);}else{initFirebase();}
 </script>
 
 </body>
